@@ -72,7 +72,7 @@ std::vector<DWORD64> ProcessManager::SearchMemory(const std::string& Signature, 
 
 	MEMORY_BASIC_INFORMATION mbi;
 	int Count;
-	while (VirtualQueryEx(hProcess, reinterpret_cast<LPCVOID>(StartAddress), &mbi, sizeof(mbi)) != 0)
+	while (m_driver.query_memory(StartAddress, &mbi))
 	{
 		Count = 0;
 		auto BlockSize = mbi.RegionSize;

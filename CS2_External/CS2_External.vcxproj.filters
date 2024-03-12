@@ -31,6 +31,9 @@
     <Filter Include="Cheats\Radar">
       <UniqueIdentifier>{e372b7a9-eba4-42de-9802-b1368314d465}</UniqueIdentifier>
     </Filter>
+    <Filter Include="driver">
+      <UniqueIdentifier>{727dbf52-ce9c-42d8-b901-b1f46b8061dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OS-ImGui\imgui\imconfig.h">
@@ -194,6 +197,21 @@
     <ClInclude Include="Utils\cpp-httplib\httplib.h" />
     <ClInclude Include="Utils\json\json.hpp" />
     <ClInclude Include="Features\Aimbot\Legitbot.hpp" />
+    <ClInclude Include="..\driver\ConsoleApplication2\driver.h">
+      <Filter>driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\driver\ConsoleApplication2\driver_data.h">
+      <Filter>driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\driver\ConsoleApplication2\loader.h">
+      <Filter>driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\driver\ConsoleApplication2\nt.hpp">
+      <Filter>driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\driver\ConsoleApplication2\自定声明.h">
+      <Filter>driver</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OS-ImGui\imgui\imgui.cpp">
@@ -261,6 +279,9 @@
     <ClCompile Include="Features\Misc.cpp" />
     <ClCompile Include="Features\StyleChanger.cpp" />
     <ClCompile Include="Features\SkinChanger\SkinChanger.cpp" />
+    <ClCompile Include="..\driver\ConsoleApplication2\driver.cpp">
+      <Filter>driver</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CS2_External.rc" />

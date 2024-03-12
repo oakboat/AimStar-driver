@@ -4,6 +4,7 @@
 #include <vector>
 #include <Tlhelp32.h>
 #include <atlconv.h>
+#include "../../driver/ConsoleApplication2/driver.h"
 #define _is_invalid(v) if(v==NULL) return false
 #define _is_invalid(v,n) if(v==NULL) return n
 #define NT_SUCCESS(Status) (((NTSTATUS)(Status)) >= 0)
@@ -59,6 +60,7 @@ enum StatusCode
 	FAILE_PROCESSID,
 	FAILE_HPROCESS,
 	FAILE_MODULE,
+	FAILE_DRIVER,
 };
 
 /// <summary>
@@ -68,10 +70,9 @@ class ProcessManager
 {
 private:
 	bool   Attached = false;
+	driver m_driver;
 
 public:
-
-	HANDLE hProcess = 0;
 	DWORD  ProcessID = 0;
 	DWORD64  ModuleAddress = 0;
 
@@ -91,100 +92,17 @@ public:
 	/// <returns>½ø³Ì×´Ì¬Âë</returns>
 	StatusCode Attach(std::string ProcessName)
 	{
+		if (!m_driver.init())
+		{
+			return FAILE_DRIVER;
+		}
+		m_driver.verify();
 		ProcessID = this->GetProcessID(ProcessName);
 		_is_invalid(ProcessID, FAILE_PROCESSID);
+		m_driver.pid = ProcessID;
 		ModuleAddress = reinterpret_cast<DWORD64>(this->GetProcessModuleHandle(ProcessName));
 		_is_invalid(ModuleAddress, FAILE_MODULE);
-		auto ObjectAttributes = [](UNICODE_STRING_Ptr ObjectName, HANDLE RootDirectory, ULONG Attributes, PSECURITY_DESCRIPTOR SecurityDescriptor)->_OBJECT_ATTRIBUTES {
-			OBJECT_ATTRIBUTES object;
-			object.Length = sizeof(OBJECT_ATTRIBUTES);
-			object.Attributes = Attributes;
-			object.RootDirectory = RootDirectory;
-			object.SecurityDescriptor = SecurityDescriptor;
-			object.ObjectName = ObjectName;
-			return object;
-		};
-
-		FUNC_RtlAdjustPrivilege f_RtlAdjustPrivilege = (FUNC_RtlAdjustPrivilege)GetProcAddress(GetModuleHandleA("ntdll"), "RtlAdjustPrivilege");
-		FUNC_NtDuplicateObject f_NtDuplicateObject = (FUNC_NtDuplicateObject)GetProcAddress(GetModuleHandleA("ntdll"), "NtDuplicateObject");
-		FUNC_NtOpenProcess f_NtOpenProcess = (FUNC_NtOpenProcess)GetProcAddress(GetModuleHandleA("ntdll"), "NtOpenProcess");
-		FUNC_NtQuerySystemInformation f_NtQuerySystemInformation = (FUNC_NtQuerySystemInformation)GetProcAddress(GetModuleHandleA("ntdll"), "NtQuerySystemInformation");
-
-
-
-
-		_OBJECT_ATTRIBUTES R_Attributes = ObjectAttributes(NULL,NULL,NULL,NULL);
-		CLIENT_ID t_CLIENT_ID= { 0 };
-		boolean OldPriv;
-
-		f_RtlAdjustPrivilege(20, TRUE, FALSE, &OldPriv);
-
-		DWORD Sizeof_SYSTEM_HANDLE_INFORMATION = sizeof(SYSTEM_HANDLE_INFORMATION);
-
-		NTSTATUS NTAPIReturn = NULL;
-		
-		do {
-			delete[] t_SYSTEM_HANDLE_INFORMATION;
-
-			Sizeof_SYSTEM_HANDLE_INFORMATION *= 1.5;
-
-			try
-			{
-				t_SYSTEM_HANDLE_INFORMATION = (PSYSTEM_HANDLE_INFORMATION) new byte[Sizeof_SYSTEM_HANDLE_INFORMATION];
-			}
-			catch (std::bad_alloc)
-			{
-
-				return FAILE_HPROCESS;
-				break;
-			}
-			Sleep(1);
-
-		} while ((NTAPIReturn = f_NtQuerySystemInformation(16, t_SYSTEM_HANDLE_INFORMATION, Sizeof_SYSTEM_HANDLE_INFORMATION, NULL)) == (NTSTATUS)0xC0000004);
-
-		if (!NT_SUCCESS(NTAPIReturn))
-		{
-			return FAILE_HPROCESS;
-		}
-
-		for (int i = 0; i < t_SYSTEM_HANDLE_INFORMATION->HandleCount; ++i) {
-			static int n = i;
-			if (n > 100) {
-				return FAILE_HPROCESS;
-			}
-
-			if (t_SYSTEM_HANDLE_INFORMATION->Handles[i].ObjectTypeNumber != 0x7)
-				continue;
-			if ((HANDLE)t_SYSTEM_HANDLE_INFORMATION->Handles[i].Handle == INVALID_HANDLE_VALUE)
-				continue;
-
-			t_CLIENT_ID.UniqueProcess = (DWORD*)t_SYSTEM_HANDLE_INFORMATION->Handles[i].ProcessId;
-
-			NTAPIReturn = f_NtOpenProcess(&Source_Process,PROCESS_DUP_HANDLE,&R_Attributes,&t_CLIENT_ID);
-
-			if (Source_Process == INVALID_HANDLE_VALUE || !NT_SUCCESS(NTAPIReturn))
-				continue;
-			NTAPIReturn = f_NtDuplicateObject(Source_Process,(HANDLE)t_SYSTEM_HANDLE_INFORMATION->Handles[i].Handle, (HANDLE)(LONG_PTR)-1,&target_handle,PROCESS_ALL_ACCESS,0,0);
-			
-			if (target_handle == INVALID_HANDLE_VALUE || !NT_SUCCESS(NTAPIReturn))
-				continue;
-			
-			if (GetProcessId(target_handle) == ProcessID) {
-				hProcess = target_handle;
-				Attached = true;
-				delete[] t_SYSTEM_HANDLE_INFORMATION;
-				break;
-			}
-			else
-			{
-				CloseHandle(target_handle);
-				CloseHandle(Source_Process);
-				continue;
-			}
-			
-
-		}
-
+		Attached = true;
 		return SUCCEED;
 	}
 
@@ -193,11 +111,6 @@ public:
 	/// </summary>
 	void Detach()
 	{
-		if (hProcess)
-			CloseHandle(hProcess);
-		hProcess = 0;
-		ProcessID = 0;
-		ModuleAddress = 0;
 		Attached = false;
 	}
 
@@ -209,9 +122,7 @@ public:
 	{
 		if (!Attached)
 			return false;
-		DWORD ExitCode{};
-		GetExitCodeProcess(hProcess, &ExitCode);
-		return ExitCode == STILL_ACTIVE;
+		return m_driver.read<char>(ModuleAddress) == 'M';
 	}
 
 	/// <summary>
@@ -225,10 +136,9 @@ public:
 	template <typename ReadType>
 	bool ReadMemory(DWORD64 Address, ReadType& Value, int Size)
 	{
-		_is_invalid(hProcess,false);
 		_is_invalid(ProcessID, false);
 
-		if (ReadProcessMemory(hProcess, reinterpret_cast<LPCVOID>(Address), &Value, Size, 0))
+		if (m_driver.read(Address, (uint64_t) & Value, Size))
 			return true;
 		return false;
 	}
@@ -236,10 +146,9 @@ public:
 	template <typename ReadType>
 	bool ReadMemory(DWORD64 Address, ReadType& Value)
 	{
-		_is_invalid(hProcess, false);
 		_is_invalid(ProcessID, false);
 
-		if (ReadProcessMemory(hProcess, reinterpret_cast<LPCVOID>(Address), &Value, sizeof(ReadType), 0))
+		if (m_driver.read(Address, (uint64_t) & Value, sizeof(ReadType)))
 			return true;
 		return false;
 	}
@@ -255,10 +164,9 @@ public:
 	template <typename ReadType>
 	bool WriteMemory(DWORD64 Address, ReadType& Value, int Size)
 	{
-		_is_invalid(hProcess, false);
 		_is_invalid(ProcessID, false);
 
-		if (WriteProcessMemory(hProcess, reinterpret_cast<LPCVOID>(Address), &Value, Size, 0))
+		if (m_driver.write(Address, (uint64_t) & Value, Size))
 			return true;
 		return false;
 	}
@@ -266,10 +174,9 @@ public:
 	template <typename ReadType>
 	bool WriteMemory(DWORD64 Address, ReadType& Value)
 	{
-		_is_invalid(hProcess, false);
 		_is_invalid(ProcessID, false);
 
-		if (WriteProcessMemory(hProcess, reinterpret_cast<LPVOID>(Address), &Value, sizeof(ReadType), 0))
+		if (m_driver.write(Address, (uint64_t) & Value, sizeof(ReadType)))
 			return true;
 		return false;
 	}
@@ -285,7 +192,6 @@ public:
 
 	DWORD64 TraceAddress(DWORD64 BaseAddress, std::vector<DWORD> Offsets)
 	{
-		_is_invalid(hProcess,0);
 		_is_invalid(ProcessID,0);
 		DWORD64 Address = 0;
 
@@ -325,22 +231,8 @@ public:
 
 	HMODULE GetProcessModuleHandle(std::string ModuleName)
 	{
-		MODULEENTRY32 ModuleInfoPE;
-		ModuleInfoPE.dwSize = sizeof(MODULEENTRY32);
-		HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, this->ProcessID);
-		Module32First(hSnapshot, &ModuleInfoPE);
-		USES_CONVERSION;
-		do {
-			if (strcmp(W2A(ModuleInfoPE.szModule), ModuleName.c_str()) == 0)
-			{
-				CloseHandle(hSnapshot);
-				return ModuleInfoPE.hModule;
-			}
-		} while (Module32Next(hSnapshot, &ModuleInfoPE));
-		CloseHandle(hSnapshot);
-		return 0;
+		return (HMODULE)m_driver.get_module_address(ModuleName.c_str());
 	}
-
 };
 
 inline ProcessManager ProcessMgr;
