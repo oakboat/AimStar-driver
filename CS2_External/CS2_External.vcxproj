@@ -145,11 +145,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\driver\ConsoleApplication2\driver.h" />
-    <ClInclude Include="..\driver\ConsoleApplication2\driver_data.h" />
-    <ClInclude Include="..\driver\ConsoleApplication2\loader.h" />
-    <ClInclude Include="..\driver\ConsoleApplication2\nt.hpp" />
-    <ClInclude Include="..\driver\ConsoleApplication2\自定声明.h" />
+    <ClInclude Include="driver\driver.h" />
+    <ClInclude Include="driver\driver_data.h" />
+    <ClInclude Include="driver\loader.h" />
+    <ClInclude Include="driver\nt.hpp" />
+    <ClInclude Include="driver\自定声明.h" />
     <ClInclude Include="Features\Aimbot\Ragebot.hpp" />
     <ClInclude Include="Bone.h" />
     <ClInclude Include="Cheats.h" />
@@ -259,9 +259,9 @@
     <ClInclude Include="View.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\driver\ConsoleApplication2\driver.cpp" />
     <ClCompile Include="Bone.cpp" />
     <ClCompile Include="Cheats.cpp" />
+    <ClCompile Include="driver\driver.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Features\Glow.cpp" />
     <ClCompile Include="Features\Misc.cpp" />

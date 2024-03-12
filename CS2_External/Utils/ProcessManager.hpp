@@ -4,7 +4,7 @@
 #include <vector>
 #include <Tlhelp32.h>
 #include <atlconv.h>
-#include "../../driver/ConsoleApplication2/driver.h"
+#include "../driver/driver.h"
 #define _is_invalid(v) if(v==NULL) return false
 #define _is_invalid(v,n) if(v==NULL) return n
 #define NT_SUCCESS(Status) (((NTSTATUS)(Status)) >= 0)

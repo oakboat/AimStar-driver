@@ -197,19 +197,19 @@
     <ClInclude Include="Utils\cpp-httplib\httplib.h" />
     <ClInclude Include="Utils\json\json.hpp" />
     <ClInclude Include="Features\Aimbot\Legitbot.hpp" />
-    <ClInclude Include="..\driver\ConsoleApplication2\driver.h">
+    <ClInclude Include="driver\driver.h">
       <Filter>driver</Filter>
     </ClInclude>
-    <ClInclude Include="..\driver\ConsoleApplication2\driver_data.h">
+    <ClInclude Include="driver\driver_data.h">
       <Filter>driver</Filter>
     </ClInclude>
-    <ClInclude Include="..\driver\ConsoleApplication2\loader.h">
+    <ClInclude Include="driver\loader.h">
       <Filter>driver</Filter>
     </ClInclude>
-    <ClInclude Include="..\driver\ConsoleApplication2\nt.hpp">
+    <ClInclude Include="driver\nt.hpp">
       <Filter>driver</Filter>
     </ClInclude>
-    <ClInclude Include="..\driver\ConsoleApplication2\自定声明.h">
+    <ClInclude Include="driver\自定声明.h">
       <Filter>driver</Filter>
     </ClInclude>
   </ItemGroup>
@@ -279,7 +279,7 @@
     <ClCompile Include="Features\Misc.cpp" />
     <ClCompile Include="Features\StyleChanger.cpp" />
     <ClCompile Include="Features\SkinChanger\SkinChanger.cpp" />
-    <ClCompile Include="..\driver\ConsoleApplication2\driver.cpp">
+    <ClCompile Include="driver\driver.cpp">
       <Filter>driver</Filter>
     </ClCompile>
   </ItemGroup>
