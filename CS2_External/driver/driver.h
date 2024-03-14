@@ -1,7 +1,6 @@
 #pragma once
 #include <Windows.h>
 #include <iostream>
-#include "×Ô¶¨ÉùÃ÷.h"
 #include <TlHelp32.h>
 
 class driver

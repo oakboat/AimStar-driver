@@ -1,20 +1,40 @@
-#include "driver.h"
+ï»¿#include "driver.h"
 #include "loader.h"
 
 #define printf(...)
+
+#define ERROR_æˆåŠŸ 0xE0000000
+#define ERROR_å¤±è´¥ 0xE0000001
+
+#define ERROR_æ— æ³•æ‰“å¼€è¿›ç¨‹ 0xE0000002
+#define ERROR_æ— æ•ˆçš„å¥æŸ„è¡¨ 0xE0000003
+#define ERROR_ç”¨æˆ·éªŒè¯å¤±è´¥ 0xE0000004
+#define ERROR_å†…å­˜ç±»å‹ä¸ç¬¦ 0xE0000005
+#define ERROR_è¶…å‡ºå†…å­˜èŒƒå›´ 0xE0000006
+#define ERROR_éšè—å†…å­˜å¤±è´¥ 0xE0000007
+#define ERROR_æŸ¥è¯¢å†…å­˜å¤±è´¥ 0xE0000008
+#define ERROR_ç”³è¯·å†…å­˜å¤±è´¥ 0xE0000009
+#define ERROR_è¶…å‡ºè¯»å†™å­—èŠ‚ 0xE000000A
+#define ERROR_åˆ†é…å†…å­˜å¤±è´¥ 0xE000000B
+#define ERROR_æ— æ•ˆçš„ç¼“å†²åŒº 0xE000000C
+#define ERROR_æ— æ³•ç»“æŸè‡ªèº« 0xE000000D
+#define ERROR_æ— æ³•è¯†åˆ«æ•°æ® 0xE000000E
+#define ERROR_è¿›ç¨‹ä½æ•°é”™è¯¯ 0xE000000F
+#define ERROR_è¯»å†™åœ°å€é”™è¯¯ 0xE0000010
+#define ERROR_åŠ«æŒçº¿ç¨‹å¤±è´¥ 0xE0000011
 
 bool driver::init()
 {
 	if (test())
 	{
-		printf("Çı¶¯ÒÑ¼ÓÔØ\n");
+		printf("é©±åŠ¨å·²åŠ è½½\n");
 		return true;
 	}
-	printf("¿ªÊ¼¼ÓÔØÇı¶¯\n");
+	printf("å¼€å§‹åŠ è½½é©±åŠ¨\n");
 	Load();
 	if (!test())
 	{
-		printf("Çı¶¯¼ÓÔØÊ§°Ü\n");
+		printf("é©±åŠ¨åŠ è½½å¤±è´¥\n");
 		return false;
 	}
 	return true;
@@ -51,9 +71,9 @@ NTSTATUS driver::call(DWORD type, void* data, DWORD size)
 bool driver::test()
 {
 	NTSTATUS status = call('0000', nullptr, 0);
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("Í¨ĞÅÊ§°Ü: %x\n", status);
+		printf("é€šä¿¡å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -61,9 +81,9 @@ bool driver::test()
 bool driver::verify()
 {
 	NTSTATUS status = call('0001', nullptr, 0);
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("ÑéÖ¤Ê§°Ü: %x\n", status);
+		printf("éªŒè¯å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -71,9 +91,9 @@ bool driver::verify()
 bool driver::inject(PINJECT_DATA data, DWORD size)
 {
 	NTSTATUS status = call('0002', data, size);
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("ÀëÏß×¢ÈëÊ§°Ü: %x\n", status);
+		printf("ç¦»çº¿æ³¨å…¥å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -86,9 +106,9 @@ bool driver::grant_handle(HANDLE handle)
 	HANDLE_GRANT_ACCESS_BUFFER buffer{ 0 };
 	buffer.Handle = handle;
 	NTSTATUS status = call('0003', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("ÌáÈ¨Ê§°Ü: %x\n", status);
+		printf("ææƒå¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -104,9 +124,9 @@ uint64_t driver::get_base_address()
 	buffer.hProcessId = pid;
 	buffer.OutBuffer = &address;
 	NTSTATUS status = call('0004', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("»ñÈ¡»ùµØÖ·Ê§°Ü: %x\n", status);
+		printf("è·å–åŸºåœ°å€å¤±è´¥: %x\n", status);
 		return 0;
 	}
 	return address;
@@ -124,9 +144,9 @@ uint64_t driver::get_module_address(const char* module_name)
 	buffer.ModuleName = const_cast<char*>(module_name);
 	buffer.OutBuffer = &address;
 	NTSTATUS status = call('0005', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("»ñÈ¡Ä£¿éµØÖ·Ê§°Ü: %x\n", status);
+		printf("è·å–æ¨¡å—åœ°å€å¤±è´¥: %x\n", status);
 		return 0;
 	}
 	return address;
@@ -147,9 +167,9 @@ bool driver::read(uint64_t src_address, uint64_t dest_address, SIZE_T size)
 	buffer.NumberOfBytes = size;
 	buffer.ReadWriteType = 0;
 	NTSTATUS status = call('0006', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("¶ÁÈ¡Ê§°Ü: %x\n", status);
+		printf("è¯»å–å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -170,9 +190,9 @@ bool driver::write(uint64_t src_address, uint64_t dest_address, SIZE_T size)
 	buffer.NumberOfBytes = size;
 	buffer.ReadWriteType = 1;
 	NTSTATUS status = call('0006', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("Ğ´ÈëÊ§°Ü: %x\n", status);
+		printf("å†™å…¥å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -193,9 +213,9 @@ bool driver::write1(uint64_t src_address, uint64_t dest_address, SIZE_T size)
 	buffer.NumberOfBytes = size;
 	buffer.ReadWriteType = 2;
 	NTSTATUS status = call('0006', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("Ğ´ÈëÊ§°Ü: %x\n", status);
+		printf("å†™å…¥å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -208,9 +228,9 @@ bool driver::force_delete(const char* file_path)
 	DRIVER_FORCE_DELETE_FILE_BUFFER buffer{ 0 };
 	buffer.FilePath = const_cast<char*>(file_path);
 	NTSTATUS status = call('0007', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("Ç¿É¾ÎÄ¼şÊ§°Ü: %x\n", status);
+		printf("å¼ºåˆ æ–‡ä»¶å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -224,9 +244,9 @@ bool driver::protect_process(BOOL enable)
 	PROTECT_PROCESS_BUFFER buffer{ 0 };
 	buffer.Enable = enable;
 	NTSTATUS status = call('0008', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("±£»¤½ø³ÌÊ§°Ü: %x\n", status);
+		printf("ä¿æŠ¤è¿›ç¨‹å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -239,9 +259,9 @@ bool driver::hide_process()
 	FORCE_HIDE_PROCESS_BUFFER buffer{ 0 };
 	buffer.hProcessId = pid;
 	NTSTATUS status = call('0009', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("Òş²Ø½ø³ÌÊ§°Ü: %x\n", status);
+		printf("éšè—è¿›ç¨‹å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -254,9 +274,9 @@ bool driver::kill_process(const char* process_name)
 	FORCE_KILL_PROCESS_BUFFER buffer{ 0 };
 	buffer.ProcessName = const_cast<char*>(process_name);
 	NTSTATUS status = call('0010', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("Ç¿É±½ø³ÌÊ§°Ü: %x\n", status);
+		printf("å¼ºæ€è¿›ç¨‹å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -278,9 +298,9 @@ uint64_t driver::alloc_memory(ULONG64 size, ULONG32 protect, ULONG32 high_addres
 	buffer.HighAddress = high_address;
 	buffer.OutBuffer = &address;
 	NTSTATUS status = call('0011', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("ÉêÇëÄÚ´æÊ§°Ü: %x\n", status);
+		printf("ç”³è¯·å†…å­˜å¤±è´¥: %x\n", status);
 		return 0;
 	}
 	return address;
@@ -295,9 +315,9 @@ bool driver::free_memory(uint64_t address)
 	buffer.hProcessId = pid;
 	buffer.MemoryAddress = reinterpret_cast<PVOID64>(address);
 	NTSTATUS status = call('0012', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("ÊÍ·ÅÄÚ´æÊ§°Ü: %x\n", status);
+		printf("é‡Šæ”¾å†…å­˜å¤±è´¥: %x\n", status);
 		return 0;
 	}
 	return address;
@@ -316,9 +336,9 @@ bool driver::protect_memory(uint64_t address, ULONG64 size, ULONG32 protect)
 	buffer.RegionSize = size;
 	buffer.NewProtect = protect;
 	NTSTATUS status = call('0013', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("ÄÚ´æÊôĞÔÊ§°Ü: %x\n", status);
+		printf("å†…å­˜å±æ€§å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -335,9 +355,9 @@ bool driver::hide_memory(uint64_t address, ULONG64 size)
 	buffer.MemAddress = address;
 	buffer.NumberOfBytes = size;
 	NTSTATUS status = call('0014', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("Òş²ØÄÚ´æÊ§°Ü: %x\n", status);
+		printf("éšè—å†…å­˜å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -354,9 +374,9 @@ bool driver::query_memory(uint64_t address, PMEMORY_BASIC_INFORMATION info)
 	buffer.MemAddress = reinterpret_cast<PVOID64>(address);
 	buffer.OutBuffer = info;
 	NTSTATUS status = call('0015', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("²éÑ¯ÄÚ´æÊ§°Ü: %x\n", status);
+		printf("æŸ¥è¯¢å†…å­˜å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -371,9 +391,9 @@ bool driver::create_thread(uint64_t address)
 	buffer.hProcessId = pid;
 	buffer.Address = reinterpret_cast<PVOID64>(address);
 	NTSTATUS status = call('0016', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("´´½¨Ïß³ÌÊ§°Ü: %x\n", status);
+		printf("åˆ›å»ºçº¿ç¨‹å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -381,9 +401,9 @@ bool driver::create_thread(uint64_t address)
 bool driver::mouse(PMOUSE_INPUT_DATA data)
 {
 	NTSTATUS status = call('0017', data, sizeof(MOUSE_INPUT_DATA));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("Ä£ÄâÊó±êÊ§°Ü: %x\n", status);
+		printf("æ¨¡æ‹Ÿé¼ æ ‡å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -391,9 +411,9 @@ bool driver::mouse(PMOUSE_INPUT_DATA data)
 bool driver::keyboard(PKEYBOARD_INPUT_DATA data)
 {
 	NTSTATUS status = call('0018', data, sizeof(KEYBOARD_INPUT_DATA));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("Ä£Äâ¼üÅÌÊ§°Ü: %x\n", status);
+		printf("æ¨¡æ‹Ÿé”®ç›˜å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -407,9 +427,9 @@ bool driver::spoof_hwid(ULONG32 type)
 	SPOOF_BUFFER buffer{ 0 };
 	buffer.Type = type;
 	NTSTATUS status = call('0019', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("¸Ä»úÆ÷ÂëÊ§°Ü: %x\n", status);
+		printf("æ”¹æœºå™¨ç å¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;
@@ -433,9 +453,9 @@ uint64_t driver::find_pattern(const char * sigin_code, ULONG32 sigin_code_size, 
 	buffer.Address = reinterpret_cast<PVOID64>(address);
 	buffer.OutBuffer = &ret_address;
 	NTSTATUS status = call('0020', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("ËÑÌØÕ÷ÂëÊ§°Ü: %x\n", status);
+		printf("æœç‰¹å¾ç å¤±è´¥: %x\n", status);
 		return 0;
 	}
 	return ret_address;
@@ -451,9 +471,9 @@ bool driver::hide_window(HWND window, UINT flag)
 	buffer.hWnd = window;
 	buffer.Flags = flag;
 	NTSTATUS status = call('0021', &buffer, sizeof(buffer));
-	if (status != ERROR_³É¹¦)
+	if (status != ERROR_æˆåŠŸ)
 	{
-		printf("´°¿Ú·´½ØÊ§°Ü: %x\n", status);
+		printf("çª—å£åæˆªå¤±è´¥: %x\n", status);
 		return false;
 	}
 	return true;

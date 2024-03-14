@@ -149,7 +149,6 @@
     <ClInclude Include="driver\driver_data.h" />
     <ClInclude Include="driver\loader.h" />
     <ClInclude Include="driver\nt.hpp" />
-    <ClInclude Include="driver\自定声明.h" />
     <ClInclude Include="Features\Aimbot\Ragebot.hpp" />
     <ClInclude Include="Bone.h" />
     <ClInclude Include="Cheats.h" />

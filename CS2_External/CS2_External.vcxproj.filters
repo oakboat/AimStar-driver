@@ -209,9 +209,6 @@
     <ClInclude Include="driver\nt.hpp">
       <Filter>driver</Filter>
     </ClInclude>
-    <ClInclude Include="driver\自定声明.h">
-      <Filter>driver</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OS-ImGui\imgui\imgui.cpp">
