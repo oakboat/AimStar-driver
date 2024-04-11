@@ -7,6 +7,12 @@
 namespace MyConfigSaver {
     extern void SaveConfig(const std::string& filename, const std::string& author = "");
     extern void LoadConfig(const std::string& filename);
+
+    template <typename T>
+    static T ReadData(const YAML::Node& node, T defaultValue)
+    {
+        return node.IsDefined() ? node.as<T>() : defaultValue;
+    }
     
     static uint32_t ImColorToUInt32(const ImColor& color)
     {
@@ -28,14 +34,20 @@ namespace MyConfigSaver {
         return TempColor;
     }
     
-    static std::vector<int> ReadVectorFromYAML(const YAML::Node& node) {
-        std::vector<int> result;
+    static std::vector<int> LoadVector(const YAML::Node& node, std::vector<int> defaultValue)
+    {
 
-        if (node.IsDefined() && node.IsSequence()) {
-            for (const auto& i : node) {
-                result.push_back(i.as<int>());
+        if (node.IsDefined() && node.IsSequence())
+        {
+            std::vector<int> result;
+            for (const YAML::Node& element : node)
+            {
+                result.push_back(element.as<int>());
             }
+            return result;
         }
-        return result;
+        else
+            return defaultValue;
+
     }
 }

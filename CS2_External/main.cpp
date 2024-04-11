@@ -3,6 +3,7 @@
 #include "Offsets.h"
 #include "Resources/Language.h"
 #include "Utils/Initial/Init.h"
+#include "Utils/ConfigSaver.hpp"
 #include <chrono>
 #include <filesystem>
 #include <iomanip>
@@ -15,6 +16,7 @@ using namespace std;
 Contributors:
 	Shinyaluvs,
 	Nx0Ri,
+	ByteCorum,
 	Skarbor,
 	PedroGoncalves,
 	KeysIsCool,
@@ -49,6 +51,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void Cheat()
 {
+	MenuConfig::HWID = Init::Client::GenerateHWID();
 	if (Init::Verify::CheckWindowVersion())
 	{
 		Lang::GetCountry(MenuConfig::Country);
@@ -97,7 +100,7 @@ void Cheat()
 	{
 		SetConsoleTextAttribute(hConsole, FOREGROUND_RED);
 		cout << "[ERROR] Failed to update offsets." << endl;
-		//Exit();
+		Exit();
 	}
 
 	if (!gGame.InitAddress())
@@ -125,6 +128,13 @@ void Cheat()
 			cerr << "[Info] Error: Failed to create the config directory." << endl;
 			Exit();
 		}
+	}
+
+	ifstream defaultConfig(MenuConfig::path + "\\default.yml");
+	if (defaultConfig.is_open())
+	{
+		MenuConfig::defaultConfig = true;
+		defaultConfig.close();		
 	}
 
 	cout << endl;
@@ -168,8 +178,9 @@ void Cheat()
 	}
 }
 
-int main()
+int main(void)
 {
+
 	const char* tempPath = std::getenv("TMP");
 	if (tempPath != nullptr)
 	{
@@ -180,6 +191,7 @@ int main()
 	if (otp)
 	{
 		Cheat();
+		return 0;
 	}
 	else
 	{
@@ -211,11 +223,17 @@ int main()
 			DispatchMessage(&msg);
 		}
 	}
+
+	return 0;
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
-	if (!otp)
+	//bool showed = false;
+	if (!otp /*&& !showed*/)
+	{
 		cout << "Please enter your OTP code! Get the OTP code from: https://aimstar.tkm.icu" << endl;
+		//showed = true;
+	}
 	static int RetTimes = 0;
 
 	switch (message) {

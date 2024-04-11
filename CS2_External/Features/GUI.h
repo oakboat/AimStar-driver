@@ -13,6 +13,7 @@
 
 ID3D11ShaderResourceView* AS_Logo = NULL;
 ID3D11ShaderResourceView* NL_Logo = NULL;
+ID3D11ShaderResourceView* AW_Logo = NULL;
 ID3D11ShaderResourceView* MenuButton1 = NULL;
 ID3D11ShaderResourceView* MenuButton2 = NULL;
 ID3D11ShaderResourceView* MenuButton3 = NULL;
@@ -21,6 +22,7 @@ ID3D11ShaderResourceView* HitboxImage = NULL;
 
 int LogoW = 0, LogoH = 0;
 int LogoW2 = 0, LogoH2 = 0;
+int LogoW3 = 0, LogoH3 = 0;
 int buttonW = 0;
 int buttonH = 0;
 int hitboxW = 0, hitboxH = 0;
@@ -34,6 +36,17 @@ bool checkbox5 = false;
 
 namespace GUI
 {
+	void LoadDefaultConfig()
+	{
+		if (!MenuConfig::defaultConfig)
+			return;
+
+		MyConfigSaver::LoadConfig("default.yml");
+		std::cout << "[Info] Default configuration loaded!" << std::endl;
+
+		MenuConfig::defaultConfig = false;
+	}
+
 	inline void InitHitboxList()
 	{
 		if (MenuConfig::HitboxUpdated)
@@ -61,7 +74,7 @@ namespace GUI
 		if (it != HitboxList.end())
 			checkbox5 = true;
 
-		MenuConfig::HitboxUpdated = false;
+		MenuConfig::HitboxUpdated = true;
 	}
 	void addHitbox(int BoneIndex)
 	{
@@ -84,6 +97,7 @@ namespace GUI
 			// Updater::CheckForUpdates();
 			Gui.LoadTextureFromMemory(Images::AS_Logo, sizeof Images::AS_Logo, &AS_Logo, &LogoW, &LogoH);
 			Gui.LoadTextureFromMemory(Images::NL_Logo, sizeof Images::NL_Logo, &NL_Logo, &LogoW2, &LogoH2);
+			Gui.LoadTextureFromMemory(Images::AW_Logo, sizeof Images::AW_Logo, &AW_Logo, &LogoW3, &LogoH3);
 			Gui.LoadTextureFromMemory(Images::VisualButton, sizeof Images::VisualButton, &MenuButton1, &buttonW, &buttonH);
 			Gui.LoadTextureFromMemory(Images::AimbotButton, sizeof Images::AimbotButton, &MenuButton2, &buttonW, &buttonH);
 			Gui.LoadTextureFromMemory(Images::MiscButton, sizeof Images::MiscButton, &MenuButton3, &buttonW, &buttonH);
@@ -185,6 +199,12 @@ namespace GUI
 			MenuConfig::ButtonBorderColor = MenuConfig::WCS.BorderColor_Purple;
 			break;
 		case 2:
+			ImageID = (void*)AW_Logo;
+			LogoSize = ImVec2(LogoW3, LogoH3);
+			LogoPos = MenuConfig::WCS.Logo3Pos;
+			MenuConfig::ButtonBorderColor = MenuConfig::WCS.BorderColor_Red;
+			break;
+		case 3:
 			ImageID = (void*)AS_Logo;
 			LogoSize = ImVec2(LogoW, LogoH);
 			LogoPos = MenuConfig::WCS.LogoPos;
@@ -207,6 +227,8 @@ namespace GUI
 		{
 			ImGui::SetCursorPos(LogoPos);
 			ImGui::Image(ImageID, LogoSize);
+			ImGui::SetCursorPosY(5);
+			ImGui::TextColored(ImColor(255, 255, 255, 20), MenuConfig::HWID.substr(MenuConfig::HWID.length() - 16).c_str());
 
 			ImGui::SetCursorPos(MenuConfig::WCS.Button1Pos);
 			ImGui::Image((void*)MenuButton1, ImVec2(buttonW, buttonH));
@@ -434,7 +456,7 @@ namespace GUI
 						ImVec2 StartPos = ImGui::GetCursorScreenPos();
 						ImGui::Image((void*)HitboxImage, ImVec2(hitboxW, hitboxH));
 						ImGui::GetWindowDrawList()->AddLine(ImVec2(StartPos.x + 130, StartPos.y + 74), ImVec2(StartPos.x + 205, StartPos.y + 74), ImColor(ImGui::GetStyleColorVec4(ImGuiCol_Border)), 1.8f); // Head
-						ImGui::SetCursorScreenPos(ImVec2(StartPos.x + 202, StartPos.y + 62)); 
+						ImGui::SetCursorScreenPos(ImVec2(StartPos.x + 203, StartPos.y + 63)); 
 						if (ImGui::Checkbox("###Head", &checkbox1))
 						{
 							if (checkbox1) {
@@ -445,7 +467,7 @@ namespace GUI
 							}
 						}
 						ImGui::GetWindowDrawList()->AddLine(ImVec2(StartPos.x + 129, StartPos.y + 103), ImVec2(StartPos.x + 59, StartPos.y + 103), ImColor(ImGui::GetStyleColorVec4(ImGuiCol_Border)), 1.8f); // Neck
-						ImGui::SetCursorScreenPos(ImVec2(StartPos.x + 40, StartPos.y + 91));
+						ImGui::SetCursorScreenPos(ImVec2(StartPos.x + 39, StartPos.y + 92));
 						if (ImGui::Checkbox("###Neck", &checkbox2))
 						{
 							if (checkbox2) {
@@ -456,7 +478,7 @@ namespace GUI
 							}
 						}
 						ImGui::GetWindowDrawList()->AddLine(ImVec2(StartPos.x + 120, StartPos.y + 141), ImVec2(StartPos.x + 195, StartPos.y + 141), ImColor(ImGui::GetStyleColorVec4(ImGuiCol_Border)), 1.8f); // Chest
-						ImGui::SetCursorScreenPos(ImVec2(StartPos.x + 192, StartPos.y + 129));
+						ImGui::SetCursorScreenPos(ImVec2(StartPos.x + 193, StartPos.y + 130));
 						if (ImGui::Checkbox("###Chest", &checkbox3))
 						{
 							if (checkbox3) {
@@ -467,7 +489,7 @@ namespace GUI
 							}
 						}
 						ImGui::GetWindowDrawList()->AddLine(ImVec2(StartPos.x + 119, StartPos.y + 167), ImVec2(StartPos.x + 44, StartPos.y + 167), ImColor(ImGui::GetStyleColorVec4(ImGuiCol_Border)), 1.8f); // Penis
-						ImGui::SetCursorScreenPos(ImVec2(StartPos.x + 25, StartPos.y + 155));
+						ImGui::SetCursorScreenPos(ImVec2(StartPos.x + 24, StartPos.y + 156));
 						if (ImGui::Checkbox("###Stomache", &checkbox4))
 						{
 							if (checkbox4) {
@@ -478,7 +500,7 @@ namespace GUI
 							}
 						}
 						ImGui::GetWindowDrawList()->AddLine(ImVec2(StartPos.x + 119, StartPos.y + 200), ImVec2(StartPos.x + 195, StartPos.y + 200), ImColor(ImGui::GetStyleColorVec4(ImGuiCol_Border)), 1.8f); // Penis
-						ImGui::SetCursorScreenPos(ImVec2(StartPos.x + 192, StartPos.y + 188));
+						ImGui::SetCursorScreenPos(ImVec2(StartPos.x + 193, StartPos.y + 189));
 						if (ImGui::Checkbox("###Penis", &checkbox5))
 						{
 							if (checkbox4) {
@@ -542,7 +564,7 @@ namespace GUI
 
 					ImGui::NewLine();
 					ImGui::SeparatorText(ICON_FA_HAND_POINTER" Triggerbot");
-					int DelayMin = 10, DelayMax = 1000;
+					int DelayMin = 0, DelayMax = 300;
 					int DurationMin = 0, DurationMax = 1000;
 					PutSwitch(Lang::TriggerText.Enable, 5.f, ImGui::GetFrameHeight() * 1.7, &MenuConfig::TriggerBot);
 					if (MenuConfig::TriggerBot)
@@ -560,7 +582,7 @@ namespace GUI
 						PutSwitch(Lang::TriggerText.Toggle, 5.f, ImGui::GetFrameHeight() * 1.7, &MenuConfig::TriggerAlways);
 						PutSwitch(Lang::TriggerText.ScopeOnly, 5.f, ImGui::GetFrameHeight() * 1.7, &TriggerBot::ScopeOnly);
 						PutSwitch(Lang::AimbotText.IgnoreFlash, 10.f, ImGui::GetFrameHeight() * 1.7, &TriggerBot::IgnoreFlash);
-						PutSliderInt(Lang::TriggerText.DelaySlider, 5.f, &TriggerBot::TriggerDelay, &DelayMin, &DelayMax, "%d ms");
+						PutSliderInt(Lang::TriggerText.DelaySlider, 1.f, &TriggerBot::TriggerDelay, &DelayMin, &DelayMax, "%d ms");
 						PutSliderInt(Lang::TriggerText.FakeShotSlider, 5.f, &TriggerBot::FakeShotDelay, &DurationMin, &DurationMax, "%d ms");
 					}
 
@@ -594,8 +616,9 @@ namespace GUI
 					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 10.f);
 					ImGui::TextDisabled(Lang::MiscText.HitSound);
 					ImGui::SameLine();
-					ImGui::SetNextItemWidth(170.f);
+					ImGui::SetNextItemWidth(165.f);
 					ImGui::Combo("###HitSounds", &MiscCFG::HitSound, "None\0Neverlose\0Skeet\0Fuck\0Senpai\0");
+					PutSwitch(Lang::MiscText.JumpThrow, 10.f, ImGui::GetFrameHeight() * 1.7, &MiscCFG::jumpthrow);
 					PutSwitch(Lang::MiscText.MoneyService, 10.f, ImGui::GetFrameHeight() * 1.7, &MiscCFG::MoneyService);
 					if (MiscCFG::MoneyService)
 						PutSwitch(Lang::MiscText.ShowCashSpent, 10.f, ImGui::GetFrameHeight() * 1.7, &MiscCFG::ShowCashSpent);
@@ -630,9 +653,9 @@ namespace GUI
 					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 5.f);
 					ImGui::TextDisabled(Lang::MiscText.ThemeList);
 					ImGui::SameLine();
-					if (ImGui::Combo("###Theme", &MenuConfig::Theme, "AimStar\0NeverLose\0Custom\0"))
+					if (ImGui::Combo("###Theme", &MenuConfig::Theme, "AimStar\0NeverLose\0AIMWARE\0Custom\0"))
 						StyleChanger::UpdateSkin(MenuConfig::Theme);
-					if (MenuConfig::Theme == 2)
+					if (MenuConfig::Theme == 3)
 					{	
 						ImColor windowBgColor = ImGui::GetStyleColorVec4(ImGuiCol_WindowBg);
 						ImColor borderColor = ImGui::GetStyleColorVec4(ImGuiCol_Border);
@@ -707,6 +730,7 @@ namespace GUI
 						if (ImGui::Button(ICON_FA_COMMENT_DOTS " QQ Group", { ImGui::GetColumnWidth() - 20.f, 25.f }))
 							Gui.OpenWebpage("https://qm.qq.com/cgi-bin/qm/qr?k=bdYSbTfM9OBycOQw3PrEkRm9B_-s3cLj&jump_from=webapi&authKey=losu+2q8xDQCrHR00oG7vU2q8Bmc+PNFxZhWwODUULf4I0c6K+/uIXSya3Vmk/XA");
 					}
+
 					ImGui::NewLine();
 					ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetColumnWidth() / 4);
 					if (ImGui::Button("Safe Exit", { 125.f, 25.f }))
@@ -721,14 +745,18 @@ namespace GUI
 					ImGui::Columns(2, nullptr, false);
 					ConfigMenu::RenderCFGmenu();
 
+					int FPS = 1200;
 					ImGui::NextColumn();
 					ImGui::SetCursorPosY(24.f);
 					ImGui::SeparatorText("Cheat Settings");
 					PutSwitch(Lang::ConfigText.SafeMode, 5.f, ImGui::GetFrameHeight() * 1.7, &MenuConfig::SafeMode, false, nullptr, nullptr, Lang::ConfigText.SafeModeHoveredTip);
+					PutSliderInt(Lang::ConfigText.fpsCap, 5.f, &MenuConfig::MaxRenderFPS, &MenuConfig::MaxFrameRate, &FPS, "%d");
 
 					ImGui::Columns(1);
 				}
 			} ImGui::EndChild();
 		} ImGui::End();
+
+		LoadDefaultConfig();
 	}
 }

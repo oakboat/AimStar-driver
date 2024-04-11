@@ -83,7 +83,7 @@ void Cheats::Run()
 	// Show menu
 	static DWORD lastTick = 0; 
 	DWORD currentTick = GetTickCount(); 
-	if ((GetAsyncKeyState(VK_INSERT) & 0x8000) && currentTick - lastTick >= 150) {
+	if ((GetAsyncKeyState(VK_INSERT) & 0x8000) && currentTick - lastTick >= 250) {
 		MenuConfig::ShowMenu = !MenuConfig::ShowMenu;
 		lastTick = currentTick;
 	}
@@ -305,6 +305,7 @@ void Cheats::Run()
 	Misc::BunnyHop(LocalEntity);
 	Misc::CheatList();
 	Misc::ForceScope(LocalEntity);
+	Misc::JumpThrow(LocalEntity);
 
 
 	// Fov line
@@ -321,40 +322,33 @@ void Cheats::Run()
 	bmb::RenderWindow();
 	
 	// Aimbot
-	if (MenuConfig::AimBot)
-	{
+	if (MenuConfig::AimBot) {
 		Render::DrawFovCircle(LocalEntity);
 
-		if (MenuConfig::AimAlways)
-		{
-			if (AimPosList.size() != 0)
-			{
+		if (MenuConfig::AimAlways || GetAsyncKeyState(AimControl::HotKey)) {
+			if (AimPosList.size() != 0) {
 				if (AimControl::Rage && !MenuConfig::SafeMode)
 					AimControl::Ragebot(LocalEntity, LocalEntity.Pawn.CameraPos, AimPosList);
 				else
 					AimControl::AimBot(LocalEntity, LocalEntity.Pawn.CameraPos, AimPosList);
 			}
 		}
-		else
-		{
-			if (GetAsyncKeyState(AimControl::HotKey))
-			{
-				if (AimPosList.size() != 0)
-				{
-					if (AimControl::Rage && !MenuConfig::SafeMode)
-						AimControl::Ragebot(LocalEntity, LocalEntity.Pawn.CameraPos, AimPosList);
-					else
-						AimControl::AimBot(LocalEntity, LocalEntity.Pawn.CameraPos, AimPosList);
-				}
-			}
-		}
 
-		if (MenuConfig::AimToggleMode && (GetAsyncKeyState(AimControl::HotKey) & 0x8000) && currentTick - lastTick >= 200)
-		{
+		if (MenuConfig::AimToggleMode && (GetAsyncKeyState(AimControl::HotKey) & 0x8000) && currentTick - lastTick >= 200) {
 			AimControl::switchToggle();
 			lastTick = currentTick;
 		}
 	}
-	if (AimControl::HasTarget == false || AimPosList.size() != 0 || !MenuConfig::AimBot)
+
+	if (!AimControl::AimBot || !AimControl::HasTarget)
 		RCS::RecoilControl(LocalEntity);
+
+	GUI::InitHitboxList();
+
+	int currentFPS = static_cast<int>(ImGui::GetIO().Framerate);
+	if (currentFPS > MenuConfig::MaxRenderFPS)
+	{
+		int FrameWait = round(1000.0 / MenuConfig::MaxRenderFPS);
+		std::this_thread::sleep_for(std::chrono::milliseconds(FrameWait));
+	}
 }

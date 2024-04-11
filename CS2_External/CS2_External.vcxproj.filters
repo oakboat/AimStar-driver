@@ -209,6 +209,7 @@
     <ClInclude Include="driver\nt.hpp">
       <Filter>driver</Filter>
     </ClInclude>
+    <ClInclude Include="Utils\Initial\system.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OS-ImGui\imgui\imgui.cpp">

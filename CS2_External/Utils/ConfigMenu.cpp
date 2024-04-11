@@ -49,6 +49,7 @@ namespace ConfigMenu {
 		if (ImGui::Button(Lang::ConfigText.Load, { 126.f, 30.f }) && selectedConfig >= 0 && selectedConfig < configFiles.size())
 		{
 			std::string selectedConfigFile = configFiles[selectedConfig];
+			std::cout << selectedConfigFile << std::endl;
 			MyConfigSaver::LoadConfig(selectedConfigFile);
 		}
 		ImGui::SameLine();
@@ -102,15 +103,15 @@ namespace ConfigMenu {
 		ImGui::SetCursorPosX(CurrentCursorX + CursorX);
 		ImGui::SeparatorText(Lang::ConfigText.SeparateLine);
 		ImGui::SetCursorPosX(CurrentCursorX + CursorX);
-		ImGui::TextDisabled(Lang::ConfigText.AuthorName);
-		ImGui::SetCursorPosX(CurrentCursorX + CursorX);
-		ImGui::SetNextItemWidth(ComponentWidth + 8);
-		ImGui::InputText("###ConfigNameInput", configAuthorBuffer, sizeof(configAuthorBuffer));
-		ImGui::SetCursorPosX(CurrentCursorX + CursorX);
 		ImGui::TextDisabled(Lang::ConfigText.ConfigName);
 		ImGui::SetCursorPosX(CurrentCursorX + CursorX);
 		ImGui::SetNextItemWidth(ComponentWidth + 8);
-		ImGui::InputText("###AuthorNameInput", configNameBuffer, sizeof(configNameBuffer));
+		ImGui::InputText("###ConfigNameInput", configNameBuffer, sizeof(configNameBuffer));
+		ImGui::SetCursorPosX(CurrentCursorX + CursorX);
+		ImGui::TextDisabled(Lang::ConfigText.AuthorName);
+		ImGui::SetCursorPosX(CurrentCursorX + CursorX);
+		ImGui::SetNextItemWidth(ComponentWidth + 8);
+		ImGui::InputText("###AuthorNameInput", configAuthorBuffer, sizeof(configAuthorBuffer));
 		ImGui::NewLine();
 		ImGui::SetCursorPosX(CurrentCursorX + CursorX);
 		if (ImGui::Button(Lang::ConfigText.Create, { 126.f, 30.f }))
@@ -134,6 +135,7 @@ namespace ConfigMenu {
 		ESPConfig::RenderDistance = 80;
 		ESPConfig::ArmorBar = false;
 		ESPConfig::ShowArmorNum = false;
+		MiscCFG::jumpthrow = false;
 		MiscCFG::NightModeAlpha = 0;
 		MiscCFG::NightMode = false;
 		MiscCFG::FlashImmunity = 0.f;
@@ -249,5 +251,7 @@ namespace ConfigMenu {
 
 		ESPConfig::DrawFov = false;
 		MenuConfig::FovCircleColor = ImColor(255, 255, 255, 255);
+
+		MenuConfig::MaxRenderFPS = 1200;
 	}
 }

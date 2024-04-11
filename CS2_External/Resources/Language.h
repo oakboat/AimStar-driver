@@ -189,6 +189,7 @@ namespace Lang
 		inline static const char* FlashImmunity;
 		inline static const char* NightMode;
 		inline static const char* Alpha;
+		inline static const char* JumpThrow;
 		
 		inline static const char* FakeDuck;
 
@@ -212,6 +213,7 @@ namespace Lang
 		inline static const char* ConfigName;
 
 		inline static const char* SafeMode;
+		inline static const char* fpsCap;
 		inline static const char* SafeModeHoveredTip;
 	} ConfigText;
 
@@ -336,15 +338,15 @@ namespace Lang
 		CrosshairsText.TargetCheck = u8"Targeting Crosshairs";
 		CrosshairsText.TeamCheck = u8"TeamCheck";
 
-		// Misc
+		// Misc 
 		MiscText.FeatureName = u8" Misc";
-		MiscText.ThemeList = u8"Theme     ";
+		MiscText.ThemeList = u8"Skin       ";
 		MiscText.StyleList = u8"Style";
 		MiscText.HeadshotLine = u8"Headshot Line";
 		MiscText.SpecCheck = u8"Cheat in Spec";
 		MiscText.NoFlash = u8"No Flash";
 		MiscText.FastStop = u8"Fast Stop";
-		MiscText.HitSound = u8"Hit Sound  ";
+		MiscText.HitSound = u8"Hit Sound ";
 		MiscText.bmbTimer = u8"Bomb Timer";
 		MiscText.SpecList = u8"Spec List";
 		MiscText.Bhop = u8"Auto Jump";
@@ -365,6 +367,7 @@ namespace Lang
 		MiscText.FlashImmunity = u8"Flash Immunity: ";
 		MiscText.NightMode = u8"Night Mode";
 		MiscText.Alpha = u8"Alpha: ";
+		MiscText.JumpThrow = u8"Jump Throw";
 
 		MiscText.FakeDuck = u8"Fake Duck";
 
@@ -384,6 +387,7 @@ namespace Lang
 		ConfigText.ConfigName = u8"Config Name";
 
 		ConfigText.SafeMode = u8"Safe Mode";
+		ConfigText.fpsCap = u8"Frame Limit: ";
 		ConfigText.SafeModeHoveredTip = u8"Disable all unsafe functions that modify game's memory";
 
 		// Readme Menu

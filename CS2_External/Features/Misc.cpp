@@ -57,7 +57,7 @@ namespace Misc
 
 		//	globalvars GV;
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize;
-		ImGui::SetNextWindowBgAlpha(0.3f);
+		ImGui::SetNextWindowBgAlpha(0.5f);
 		ImGui::Begin("Watermark", nullptr, windowFlags);
 
 		// Cheat FPS
@@ -408,5 +408,24 @@ namespace Misc
 		ImGui::End();
 		ImGui::PopStyleColor();
 			
+	}
+
+	void JumpThrow(const CEntity& Local) noexcept
+	{
+		if (!MiscCFG::jumpthrow)
+			return;
+
+		bool isOnGround = AirCheck(Local);
+		if (!isOnGround)
+		{
+			Vec3 Velocity;
+			ProcessMgr.ReadMemory<Vec3>(Local.Pawn.Address + Offset::Pawn.AbsVelocity, Velocity);
+
+			if (Velocity.z > 16.f || Velocity.z < -16.f)
+				return;
+
+			mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+			mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+		}
 	}
 }
